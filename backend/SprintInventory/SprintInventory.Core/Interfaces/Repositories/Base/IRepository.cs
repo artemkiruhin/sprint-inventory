@@ -1,4 +1,6 @@
-﻿namespace SprintInventory.Core.Interfaces.Repositories.Base;
+﻿using System.Linq.Expressions;
+
+namespace SprintInventory.Core.Interfaces.Repositories.Base;
 
 public interface IRepository<TEntity> where TEntity: class
 {
@@ -7,4 +9,5 @@ public interface IRepository<TEntity> where TEntity: class
     Task<Guid> Delete(Guid id, CancellationToken ct);
     Task<TEntity?> GetById(Guid id, CancellationToken ct);
     Task<IEnumerable<TEntity>> GetAll(CancellationToken ct);
+    Task<IEnumerable<TEntity>> Search(Expression<Func<TEntity, bool>> predicate, CancellationToken ct);
 }
