@@ -9,8 +9,11 @@
     <ItemGroup>
       <Folder Include="Interfaces\Repositories\" />
       <Folder Include="Interfaces\Services\" />
-      <Folder Include="Models\Contracts\" />
-      <Folder Include="Models\DTOs\" />
+      <Folder Include="Models\Contracts\Create\" />
+      <Folder Include="Models\Contracts\Specific\" />
+      <Folder Include="Models\Contracts\Update\" />
+      <Folder Include="Models\DTOs\Detailed\" />
+      <Folder Include="Models\DTOs\Short\" />
     </ItemGroup>
 
 </Project>
