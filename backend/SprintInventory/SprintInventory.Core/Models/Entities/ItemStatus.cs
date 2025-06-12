@@ -2,7 +2,7 @@
 
 public enum ItemStatus
 {
-    Normal,
-    Unused,
-    WrittenOff
+    Normal = 0,
+    Unused = 1,
+    WrittenOff = 2
 }
