@@ -9,4 +9,14 @@ public class InventoryItemStatusLogEntity
     public DateTime Timestamp { get; set; }
     
     public virtual UserEntity User { get; set; } = null!;
+
+    public static InventoryItemStatusLogEntity Create(ItemStatus statusFrom, ItemStatus statusTo, Guid? userId)
+        => new()
+        {
+            Id = Guid.NewGuid(),
+            StatusFrom = statusFrom,
+            StatusTo = statusTo,
+            UserId = userId,
+            Timestamp = DateTime.UtcNow
+        };
 }
