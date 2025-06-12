@@ -8,4 +8,12 @@ public class InventoryItemCreatingLogEntity
     
     public virtual UserEntity User { get; set; } = null!;
     public virtual InventoryItemEntity InventoryItem { get; set; } = null!;
+
+    public static InventoryItemCreatingLogEntity Create(Guid itemId, Guid userId)
+        => new()
+        {
+            Id = Guid.NewGuid(),
+            ItemId = itemId,
+            UserId = userId
+        };
 }
