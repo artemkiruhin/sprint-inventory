@@ -13,4 +13,19 @@ public class InventoryItemMovementEntity
     public virtual InventoryItemEntity InventoryItem { get; set; } = null!;
     public virtual RoomEntity? RoomFrom { get; set; } = null!;
     public virtual RoomEntity? RoomTo { get; set; } = null!;
+
+    public static InventoryItemMovementEntity Create(Guid itemId, Guid? roomFromId, Guid? roomToId, Guid? userId)
+    {
+        if (!roomFromId.HasValue && !roomToId.HasValue) throw new ArgumentNullException("Room (from) Id and Room (to) Id cannot be null");
+        
+        return new()
+        {
+            Id = Guid.NewGuid(),
+            ItemId = itemId,
+            RoomFromId = roomFromId,
+            RoomToId = roomToId,
+            UserId = userId,
+            Timestamp = DateTime.UtcNow
+        };
+    } 
 }
