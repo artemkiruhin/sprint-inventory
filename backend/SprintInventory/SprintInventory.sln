@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprintInventory.Core", "SprintInventory.Core\SprintInventory.Core.csproj", "{005DB99D-8199-4760-849F-EC549A0417B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprintInventory.Services", "SprintInventory.Services\SprintInventory.Services.csproj", "{742E9961-B54B-4CDF-9E51-CB59A56EBF23}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprintInventory.Infrastructure", "SprintInventory.Infrastructure\SprintInventory.Infrastructure.csproj", "{FBAD197C-BFA7-4807-8D30-269CD6548D44}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprintInventory.API", "SprintInventory.API\SprintInventory.API.csproj", "{D0AD4852-1490-4801-BDC7-0D6D2DF34877}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{005DB99D-8199-4760-849F-EC549A0417B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{005DB99D-8199-4760-849F-EC549A0417B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{005DB99D-8199-4760-849F-EC549A0417B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{005DB99D-8199-4760-849F-EC549A0417B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{742E9961-B54B-4CDF-9E51-CB59A56EBF23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{742E9961-B54B-4CDF-9E51-CB59A56EBF23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{742E9961-B54B-4CDF-9E51-CB59A56EBF23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{742E9961-B54B-4CDF-9E51-CB59A56EBF23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBAD197C-BFA7-4807-8D30-269CD6548D44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBAD197C-BFA7-4807-8D30-269CD6548D44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBAD197C-BFA7-4807-8D30-269CD6548D44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBAD197C-BFA7-4807-8D30-269CD6548D44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0AD4852-1490-4801-BDC7-0D6D2DF34877}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0AD4852-1490-4801-BDC7-0D6D2DF34877}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0AD4852-1490-4801-BDC7-0D6D2DF34877}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0AD4852-1490-4801-BDC7-0D6D2DF34877}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
