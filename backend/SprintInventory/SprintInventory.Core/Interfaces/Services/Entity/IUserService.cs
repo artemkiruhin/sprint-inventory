@@ -18,4 +18,5 @@ public interface IUserService
     Task<Result<List<UserShortDTO>>> GetAllUsersShort(CancellationToken ct);
     Task<Result<UserDetailedDTO>> GetUserById(Guid id, CancellationToken ct);
     Task<Result<LoginResponseContract>> Login(LoginRequestContract request, CancellationToken ct);
+    Task<Result<Guid>> ChangePasswordAsUser(ChangePasswordAsUserContract request, CancellationToken ct);
 }
