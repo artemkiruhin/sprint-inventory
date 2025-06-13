@@ -10,4 +10,8 @@
       <Folder Include="Repositories\Base\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\SprintInventory.Core\SprintInventory.Core.csproj" />
+    </ItemGroup>
+
 </Project>
