@@ -9,7 +9,11 @@
     <ItemGroup>
       <Folder Include="EntityServices\" />
       <Folder Include="Extensions\" />
-      <Folder Include="Security\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\SprintInventory.Core\SprintInventory.Core.csproj" />
+      <ProjectReference Include="..\SprintInventory.Infrastructure\SprintInventory.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>
