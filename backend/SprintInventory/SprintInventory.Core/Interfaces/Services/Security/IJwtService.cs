@@ -1,8 +1,9 @@
-﻿using SprintInventory.Core.Models.Entities;
+﻿using SprintInventory.Core.Models.DTOs;
+using SprintInventory.Core.Models.Entities;
 
 namespace SprintInventory.Core.Interfaces.Services.Security;
 
 public interface IJwtService
 {
-    string GenerateToken(Guid userId);
+    Result<string> GenerateToken(Guid userId);
 }
