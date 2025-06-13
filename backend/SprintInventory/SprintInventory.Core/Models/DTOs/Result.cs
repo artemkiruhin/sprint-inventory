@@ -6,9 +6,9 @@ public class Result<TResult>
     public string? ErrorMessage { get; set; }
     public bool IsSuccess { get; init; }
 
-    public Result<TResult> Success(TResult data)
-        => new() { Data = data, IsSuccess = IsSuccess, ErrorMessage = string.Empty };
+    public static Result<TResult> Success(TResult data)
+        => new() { Data = data, IsSuccess = true, ErrorMessage = string.Empty };
 
-    public Result<TResult> Failure(string errorMessage)
+    public static  Result<TResult> Failure(string errorMessage)
         => new() { IsSuccess = false, ErrorMessage = errorMessage };
 }
