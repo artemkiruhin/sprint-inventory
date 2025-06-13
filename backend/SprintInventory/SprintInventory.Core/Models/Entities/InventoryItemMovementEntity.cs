@@ -9,7 +9,7 @@ public class InventoryItemMovementEntity
     public Guid? UserId { get; set; }
     public DateTime Timestamp { get; set; }
     
-    public virtual UserEntity User { get; set; } = null!;
+    public virtual UserEntity? User { get; set; } = null!;
     public virtual InventoryItemEntity InventoryItem { get; set; } = null!;
     public virtual RoomEntity? RoomFrom { get; set; } = null!;
     public virtual RoomEntity? RoomTo { get; set; } = null!;

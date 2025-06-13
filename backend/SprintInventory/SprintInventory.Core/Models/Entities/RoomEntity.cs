@@ -2,9 +2,9 @@
 
 public class RoomEntity
 {
-    private const uint NameMinLength = 3;
-    private const uint NameMaxLength = 20;
-    private const uint AddressMinLength = 5;
+    public const int NameMinLength = 3;
+    public const int NameMaxLength = 20;
+    public const int AddressMinLength = 5;
     
     public Guid Id { get; set; }
     public required string Name { get; set; }

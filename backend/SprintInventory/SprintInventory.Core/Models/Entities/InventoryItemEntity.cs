@@ -23,6 +23,7 @@ public class InventoryItemEntity
     public virtual CategoryEntity? Category { get; set; } = null!;
     public virtual ICollection<InventoryItemMovementEntity> Movements { get; set; } = [];
     public virtual ICollection<InventoryItemCreatingLogEntity> CreatingLogs { get; set; } = [];
+    public virtual ICollection<InventoryItemStatusLogEntity> StatusChanges { get; set; } = [];
 
     public static InventoryItemEntity Create(
         string name,

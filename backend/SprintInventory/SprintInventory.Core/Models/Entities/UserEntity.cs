@@ -2,12 +2,12 @@
 
 public class UserEntity
 {
-    private const uint UsernameMinLength = 4;
-    private const uint UsernameMaxLength = 15;
-    private const uint NameMinLength = 2;
-    private const uint NameMaxLength = 15;
-    private const uint SurnameMinLength = 2;
-    private const uint SurnameMaxLength = 20;
+    public const int UsernameMinLength = 4;
+    public const int UsernameMaxLength = 15;
+    public const int NameMinLength = 2;
+    public const int NameMaxLength = 15;
+    public const int SurnameMinLength = 2;
+    public const int SurnameMaxLength = 20;
     
     public Guid Id { get; set; }
     public required string Username { get; set; }

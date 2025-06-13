@@ -9,7 +9,7 @@ public class InventoryItemStatusLogEntity
     public Guid? UserId { get; set; }
     public DateTime Timestamp { get; set; }
     
-    public virtual UserEntity User { get; set; } = null!;
+    public virtual UserEntity? User { get; set; }
     public virtual InventoryItemEntity Item { get; set; } = null!;
 
     public static InventoryItemStatusLogEntity Create(Guid itemId, ItemStatus statusFrom, ItemStatus statusTo, Guid? userId)
