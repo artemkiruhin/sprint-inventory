@@ -7,10 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="EntityServices\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\SprintInventory.Core\SprintInventory.Core.csproj" />
       <ProjectReference Include="..\SprintInventory.Infrastructure\SprintInventory.Infrastructure.csproj" />
     </ItemGroup>
