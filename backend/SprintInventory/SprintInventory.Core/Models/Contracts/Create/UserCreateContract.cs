@@ -7,5 +7,6 @@ public record UserCreateContract(
     string Surname,
     string? Patronymic,
     string? Email,
-    bool IsAdmin
+    bool IsAdmin,
+    Guid SenderId
 );
