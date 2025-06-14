@@ -2,6 +2,7 @@
 
 public record MovementCreateContract(
     Guid ItemId,
+    Guid RoomFromId,
     Guid RoomToId,
     Guid CreatorId
 );
