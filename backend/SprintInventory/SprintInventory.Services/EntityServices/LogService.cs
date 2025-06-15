@@ -53,12 +53,20 @@ public class LogService : ILogService
         {
             var itemByRequest = await _database.InventoryItemRepository.GetById(request.ItemId, ct);
             if (itemByRequest == null) return Result<Guid>.Failure("Item does not exist");
+
+            if (!request.RoomFromId.HasValue && !request.RoomToId.HasValue) return Result<Guid>.Failure("No room from or room to found");
             
-            var roomFromByRequest = await _database.RoomRepository.GetById(request.RoomFromId, ct);
-            if (roomFromByRequest == null) return Result<Guid>.Failure("Room does not exist");
-            
-            var roomToByRequest = await _database.RoomRepository.GetById(request.RoomToId, ct);
-            if (roomToByRequest == null) return Result<Guid>.Failure("Room does not exist");
+            if (request.RoomFromId.HasValue)
+            {
+                var roomFromByRequest = await _database.RoomRepository.GetById(request.RoomFromId.Value, ct);
+                if (roomFromByRequest == null) return Result<Guid>.Failure("Room does not exist");
+            }
+
+            if (request.RoomToId.HasValue)
+            {
+                var roomToByRequest = await _database.RoomRepository.GetById(request.RoomToId.Value, ct);
+                if (roomToByRequest == null) return Result<Guid>.Failure("Room does not exist");
+            }
             
             var creatorByRequest = await _database.UserRepository.GetById(request.CreatorId, ct);
             if (creatorByRequest == null) return Result<Guid>.Failure("Creator does not exist");
