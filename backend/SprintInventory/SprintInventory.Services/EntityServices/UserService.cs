@@ -1,5 +1,6 @@
 ﻿using SprintInventory.Core.Interfaces;
 using SprintInventory.Core.Interfaces.Services.Entity;
+using SprintInventory.Core.Interfaces.Services.Mapper;
 using SprintInventory.Core.Interfaces.Services.Security;
 using SprintInventory.Core.Models.Contracts.Create;
 using SprintInventory.Core.Models.Contracts.Delete;
@@ -16,11 +17,13 @@ public class UserService : IUserService
 {
     private readonly IUnitOfWork _database;
     private readonly IJwtService _jwtService;
+    private readonly IUserMapper _mapper;
 
-    public UserService(IUnitOfWork database, IJwtService jwtService)
+    public UserService(IUnitOfWork database, IJwtService jwtService, IUserMapper mapper)
     {
         _database = database;
         _jwtService = jwtService;
+        _mapper = mapper;
     }
     
     public async Task<Result<Guid>> Create(UserCreateContract request, CancellationToken ct)
@@ -192,19 +195,7 @@ public class UserService : IUserService
         try
         {
             var users = await _database.UserRepository.GetAll(ct);
-            var dtos = users.Select(entity => new UserDetailedDTO(
-                Id: entity.Id,
-                Username: entity.Username,
-                PasswordHash: entity.PasswordHash,
-                Name: entity.Name,
-                Surname: entity.Surname,
-                Patronymic: entity.Patronymic,
-                Email: entity.Email,
-                CreatedAt: entity.CreatedAt,
-                IsAdmin: entity.IsAdmin,
-                IsBlocked: entity.IsBlocked,
-                BlockedAt: entity.BlockedAt
-            )).ToList();
+            var dtos = _mapper.MapToDetailedDTORange(users.ToList());
             return Result<List<UserDetailedDTO>>.Success(dtos);
         }
         catch (Exception e)
@@ -218,11 +209,7 @@ public class UserService : IUserService
         try
         {
             var users = await _database.UserRepository.GetAll(ct);
-            var dtos = users.Select(entity => new UserShortDTO(
-                Id: entity.Id,
-                Username: entity.Username,
-                IsAdmin: entity.IsAdmin
-            )).ToList();
+            var dtos = _mapper.MapToShortDTORange(users.ToList());
             return Result<List<UserShortDTO>>.Success(dtos);
         }
         catch (Exception e)
@@ -237,20 +224,7 @@ public class UserService : IUserService
         {
             var user = await _database.UserRepository.GetById(id, ct);
             if (user is null) return Result<UserDetailedDTO>.Failure("User not found");
-            
-            var dto = new UserDetailedDTO(
-                Id: user.Id,
-                Username: user.Username,
-                PasswordHash: user.PasswordHash,
-                Name: user.Name,
-                Surname: user.Surname,
-                Patronymic: user.Patronymic,
-                Email: user.Email,
-                CreatedAt: user.CreatedAt,
-                IsAdmin: user.IsAdmin,
-                IsBlocked: user.IsBlocked,
-                BlockedAt: user.BlockedAt
-            );
+            var dto = _mapper.MapToDetailedDTO(user);
             return Result<UserDetailedDTO>.Success(dto);
         }
         catch (Exception e)
