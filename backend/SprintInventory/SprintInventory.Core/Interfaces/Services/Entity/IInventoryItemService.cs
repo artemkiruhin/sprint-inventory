@@ -17,4 +17,5 @@ public interface IInventoryItemService
     Task<Result<List<InventoryItemShortDTO>>> GetAllItemsShort(CancellationToken ct);
     Task<Result<InventoryItemDetailedDTO>> GetItemById(Guid id, CancellationToken ct);
     Task<Result<Guid>> RemoveRoom(RemoveRoomInInventoryItemContract request, CancellationToken ct);
+    Task<Result<Guid>> Move(MovementInventoryItemContract request, CancellationToken ct);
 }

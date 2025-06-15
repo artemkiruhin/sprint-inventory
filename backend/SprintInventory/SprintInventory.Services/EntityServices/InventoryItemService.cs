@@ -16,11 +16,13 @@ public class InventoryItemService : IInventoryItemService
 {
     private readonly IUnitOfWork _database;
     private readonly IItemStatusExtensionService _extItemService;
+    private readonly ILogService _logger;
 
-    public InventoryItemService(IUnitOfWork database, IItemStatusExtensionService extItemService)
+    public InventoryItemService(IUnitOfWork database, IItemStatusExtensionService extItemService, ILogService logger)
     {
         _database = database;
         _extItemService = extItemService;
+        _logger = logger;
     }
     public async Task<Result<Guid>> Create(InventoryItemCreateContract request, CancellationToken ct)
     {
@@ -61,6 +63,12 @@ public class InventoryItemService : IInventoryItemService
             );
             var createdItem = await _database.InventoryItemRepository.Create(newItem, ct);
             await _database.SaveChangesAsync(ct);
+
+            var logResult = await _logger.LogCreating(
+                new CreatingLogCreateContract(createdItem.Id, request.CreatorId),
+                ct
+            );
+            
             await _database.CommitTransactionAsync(ct);
             return Result<Guid>.Success(createdItem.Id);
         }
@@ -288,10 +296,15 @@ public class InventoryItemService : IInventoryItemService
             var userByRequest = await _database.UserRepository.GetById(request.UserId, ct);
             if (userByRequest == null) return Result<Guid>.Failure("User not found");
             
+            var roomFromId = existItem.RoomId;
             existItem.Room = null;
             
             var updatedItem = _database.InventoryItemRepository.Update(existItem, ct);
             await _database.SaveChangesAsync(ct);
+            
+            var logResult = await _logger.LogMovement(new MovementCreateContract(updatedItem.Id, roomFromId, null, request.UserId), ct);
+            if (!logResult.IsSuccess) return Result<Guid>.Failure(logResult.ErrorMessage ?? "Failed to create inventory item");
+            
             await _database.CommitTransactionAsync(ct);
             return Result<Guid>.Success(updatedItem.Id);
         }
@@ -299,6 +312,34 @@ public class InventoryItemService : IInventoryItemService
         {
             await _database.RollbackTransactionAsync(ct);
             return Result<Guid>.Failure($"Error removing room of item: {e.Message}");
+        }
+    }
+
+    public async Task<Result<Guid>> Move(MovementInventoryItemContract request, CancellationToken ct)
+    {
+        await _database.BeginTransactionAsync(ct);
+        try
+        {
+            var item = await _database.InventoryItemRepository.GetById(request.ItemId, ct);
+            if (item == null) return Result<Guid>.Failure("Item not found");
+            
+            var userByRequest = await _database.UserRepository.GetById(request.UserId, ct);
+            if (userByRequest == null) return Result<Guid>.Failure("User not found");
+            
+            var roomFromId = item.Room?.Id;
+            item.RoomId = request.RoomId;
+            
+            await _database.SaveChangesAsync(ct);
+            
+            var logResult = await _logger.LogMovement(new MovementCreateContract(request.ItemId, roomFromId, request.RoomId, request.UserId), ct);
+            if (!logResult.IsSuccess) return Result<Guid>.Failure(logResult.ErrorMessage ?? "Failed to create inventory item");
+            await _database.CommitTransactionAsync(ct);
+            return Result<Guid>.Success(item.Id);
+        }
+        catch (Exception e)
+        {
+            await _database.RollbackTransactionAsync(ct);
+            return Result<Guid>.Failure($"Error moving item: {e.Message}");
         }
     }
 }
