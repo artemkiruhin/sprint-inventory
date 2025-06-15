@@ -1,5 +1,6 @@
 ﻿using SprintInventory.Core.Interfaces;
 using SprintInventory.Core.Interfaces.Services.Entity;
+using SprintInventory.Core.Interfaces.Services.Mapper;
 using SprintInventory.Core.Models.Contracts.Create;
 using SprintInventory.Core.Models.Contracts.Delete;
 using SprintInventory.Core.Models.Contracts.Update;
@@ -13,10 +14,12 @@ namespace SprintInventory.Services.EntityServices;
 public class RoomService : IRoomService
 {
     private readonly IUnitOfWork _database;
+    private readonly IRoomMapper _mapper;
 
-    public RoomService(IUnitOfWork database)
+    public RoomService(IUnitOfWork database, IRoomMapper mapper)
     {
         _database = database;
+        _mapper = mapper;
     }
     
     public async Task<Result<Guid>> Create(RoomCreateContract request, CancellationToken ct)
@@ -109,17 +112,7 @@ public class RoomService : IRoomService
         try
         {
             var rooms = await _database.RoomRepository.GetAll(ct);
-            var dtos = rooms.Select(entity => new RoomDetailedDTO(
-                Id: entity.Id,
-                Name: entity.Name,
-                Address: entity.Address,
-                CreatedAt: entity.CreatedAt,
-                Creator: new UserShortDTO(
-                    Id: entity.CreatorId,
-                    Username: entity.Creator.Username,
-                    IsAdmin: entity.Creator.IsAdmin
-                )
-            )).ToList();
+            var dtos = _mapper.MapToDetailedDTORange(rooms.ToList());
             return Result<List<RoomDetailedDTO>>.Success(dtos);
         }
         catch (Exception e)
@@ -133,11 +126,7 @@ public class RoomService : IRoomService
         try
         {
             var rooms = await _database.RoomRepository.GetAll(ct);
-            var dtos = rooms.Select(entity => new RoomShortDTO(
-                Id: entity.Id,
-                Name: entity.Name,
-                Address: entity.Address
-            )).ToList();
+            var dtos = _mapper.MapToShortDTORange(rooms.ToList());
             return Result<List<RoomShortDTO>>.Success(dtos);
         }
         catch (Exception e)
@@ -152,18 +141,7 @@ public class RoomService : IRoomService
         {
             var room = await _database.RoomRepository.GetById(id, ct);
             if (room == null) return Result<RoomDetailedDTO>.Failure("Room not found");
-
-            var dtos = new RoomDetailedDTO(
-                Id: room.Id,
-                Name: room.Name,
-                Address: room.Address,
-                CreatedAt: room.CreatedAt,
-                Creator: new UserShortDTO(
-                    Id: room.CreatorId,
-                    Username: room.Creator.Username,
-                    IsAdmin: room.Creator.IsAdmin
-                )
-            );
+            var dtos = _mapper.MapToDetailedDTO(room);
             return Result<RoomDetailedDTO>.Success(dtos);
         }
         catch (Exception e)
