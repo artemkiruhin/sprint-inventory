@@ -1,6 +1,7 @@
 ﻿using SprintInventory.Core.Interfaces;
 using SprintInventory.Core.Interfaces.Services.Entity;
 using SprintInventory.Core.Interfaces.Services.Extension;
+using SprintInventory.Core.Interfaces.Services.Mapper;
 using SprintInventory.Core.Models.Contracts.Create;
 using SprintInventory.Core.Models.Contracts.Delete;
 using SprintInventory.Core.Models.Contracts.Specific;
@@ -15,14 +16,14 @@ namespace SprintInventory.Services.EntityServices;
 public class InventoryItemService : IInventoryItemService
 {
     private readonly IUnitOfWork _database;
-    private readonly IItemStatusExtensionService _extItemService;
     private readonly ILogService _logger;
+    private readonly IInventoryItemMapper _mapper;
 
-    public InventoryItemService(IUnitOfWork database, IItemStatusExtensionService extItemService, ILogService logger)
+    public InventoryItemService(IUnitOfWork database, ILogService logger, IInventoryItemMapper mapper)
     {
         _database = database;
-        _extItemService = extItemService;
         _logger = logger;
+        _mapper = mapper;
     }
     public async Task<Result<Guid>> Create(InventoryItemCreateContract request, CancellationToken ct)
     {
@@ -172,34 +173,7 @@ public class InventoryItemService : IInventoryItemService
         try
         {
             var items = await _database.InventoryItemRepository.GetAll(ct);
-            var dtos = items.Select(entity => new InventoryItemDetailedDTO(
-                Id: entity.Id,
-                Name: entity.Name,
-                Description: entity.Description,
-                InventoryNumber: entity.InventoryNumber,
-                SerialNumber: entity.SerialNumber,
-                Status: _extItemService.GetStringName(entity.Status),
-                CreatedAt: entity.CreatedAt,
-                Creator: new UserShortDTO(
-                    Id: entity.Creator.Id,
-                    Username: entity.Creator.Username,
-                    IsAdmin: entity.Creator.IsAdmin
-                ),
-                Room: entity.Room != null
-                    ? new RoomShortDTO(
-                        Id: entity.Room.Id,
-                        Name: entity.Room.Name,
-                        Address: entity.Room.Address
-                    )
-                    : null,
-                Category: entity.Category != null
-                    ? new CategoryShortDTO(
-                        Id: entity.Category.Id,
-                        Name: entity.Category.Name,
-                        Description: entity.Category.Description
-                    )
-                    : null
-            )).ToList();
+            var dtos = _mapper.MapToDetailedDTORange(items.ToList());
             return Result<List<InventoryItemDetailedDTO>>.Success(dtos);
         }
         catch (Exception e)
@@ -214,24 +188,7 @@ public class InventoryItemService : IInventoryItemService
         try
         {
             var items = await _database.InventoryItemRepository.GetAll(ct);
-            var dtos = items.Select(entity => new InventoryItemShortDTO(
-                Id: entity.Id,
-                Name: entity.Name,
-                Description: entity.Description,
-                InventoryNumber: entity.InventoryNumber,
-                SerialNumber: entity.SerialNumber,
-                Status: _extItemService.GetStringName(entity.Status),
-                CreatedAt: entity.CreatedAt,
-                CreatorId: entity.Creator.Id,
-                RoomName: entity.Room?.Name ?? "Нет кабинета",
-                Category: entity.Category != null
-                    ? new CategoryShortDTO(
-                        Id: entity.Category.Id,
-                        Name: entity.Category.Name,
-                        Description: entity.Category.Description
-                    )
-                    : null
-            )).ToList();
+            var dtos = _mapper.MapToShortDTORange(items.ToList());
             return Result<List<InventoryItemShortDTO>>.Success(dtos);
         }
         catch (Exception e)
@@ -247,35 +204,7 @@ public class InventoryItemService : IInventoryItemService
         {
             var item = await _database.InventoryItemRepository.GetById(id, ct);
             if (item == null) return Result<InventoryItemDetailedDTO>.Failure("Item not found");
-
-            var dto = new InventoryItemDetailedDTO(
-                Id: item.Id,
-                Name: item.Name,
-                Description: item.Description,
-                InventoryNumber: item.InventoryNumber,
-                SerialNumber: item.SerialNumber,
-                Status: _extItemService.GetStringName(item.Status),
-                CreatedAt: item.CreatedAt,
-                Creator: new UserShortDTO(
-                    Id: item.Creator.Id,
-                    Username: item.Creator.Username,
-                    IsAdmin: item.Creator.IsAdmin
-                ),
-                Room: item.Room != null
-                    ? new RoomShortDTO(
-                        Id: item.Room.Id,
-                        Name: item.Room.Name,
-                        Address: item.Room.Address
-                    )
-                    : null,
-                Category: item.Category != null
-                    ? new CategoryShortDTO(
-                        Id: item.Category.Id,
-                        Name: item.Category.Name,
-                        Description: item.Category.Description
-                    )
-                    : null
-            );
+            var dto = _mapper.MapToDetailedDTO(item);
             return Result<InventoryItemDetailedDTO>.Success(dto);
         }
         catch (Exception e)
