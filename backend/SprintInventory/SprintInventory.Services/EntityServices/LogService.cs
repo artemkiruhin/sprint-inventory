@@ -2,6 +2,7 @@
 using SprintInventory.Core.Interfaces;
 using SprintInventory.Core.Interfaces.Services.Entity;
 using SprintInventory.Core.Interfaces.Services.Extension;
+using SprintInventory.Core.Interfaces.Services.Mapper;
 using SprintInventory.Core.Models.Contracts.Create;
 using SprintInventory.Core.Models.DTOs;
 using SprintInventory.Core.Models.DTOs.Detailed;
@@ -13,12 +14,12 @@ namespace SprintInventory.Services.EntityServices;
 public class LogService : ILogService
 {
     private readonly IUnitOfWork _database;
-    private readonly IItemStatusExtensionService _statusExt;
+    private readonly ILogMapper _mapper;
 
-    public LogService(IUnitOfWork database, IItemStatusExtensionService statusExt)
+    public LogService(IUnitOfWork database, ILogMapper mapper)
     {
         _database = database;
-        _statusExt = statusExt;
+        _mapper = mapper;
     }
     
     public async Task<Result<Guid>> LogStatusChange(StatusLogCreateContract request, CancellationToken ct)
@@ -115,34 +116,7 @@ public class LogService : ILogService
         try
         {
             var logs = await _database.CreatingLogRepository.GetAll(ct);
-            var dtos = logs.Select(entity => new CreatingLogDetailedDTO(
-                Id: entity.Id,
-                ItemId: entity.ItemId,
-                UserId: entity.UserId,
-                User: new UserShortDTO(
-                    Id: entity.UserId,
-                    Username: entity.User.Username,
-                    IsAdmin: entity.User.IsAdmin
-                ),
-                InventoryItem: new InventoryItemShortDTO(
-                    Id: entity.InventoryItem.Id,
-                    Name: entity.InventoryItem.Name,
-                    Description: entity.InventoryItem.Description,
-                    InventoryNumber: entity.InventoryItem.InventoryNumber,
-                    SerialNumber: entity.InventoryItem.SerialNumber,
-                    Status: _statusExt.GetStringName(entity.InventoryItem.Status),
-                    CreatorId: entity.InventoryItem.CreatorId,
-                    RoomName: entity.InventoryItem.Room?.Name ?? "Нет кабинета",
-                    Category: entity.InventoryItem.Category != null
-                        ? new CategoryShortDTO(
-                            Id: entity.InventoryItem.Category.Id,
-                            Name: entity.InventoryItem.Category.Name,
-                            Description: entity.InventoryItem.Category.Description
-                        )
-                        : null,
-                    CreatedAt: entity.InventoryItem.CreatedAt
-                )
-            )).ToList();
+            var dtos = _mapper.MapCreatingLogDetailedDTORange(logs.ToList());
             return Result<List<CreatingLogDetailedDTO>>.Success(dtos);
         }
         catch (Exception e)
@@ -156,32 +130,7 @@ public class LogService : ILogService
         try
         {
             var logs = await _database.MovementRepository.GetAll(ct);
-            var dtos = logs.Select(entity => new MovementDetailedDTO(
-                Id: entity.Id,
-                ItemId: entity.ItemId,
-                Timestamp: entity.Timestamp,
-                RoomFrom: entity.RoomFrom != null
-                    ? new RoomShortDTO(
-                        Id: entity.RoomFrom.Id,
-                        Name: entity.RoomFrom.Name,
-                        Address: entity.RoomFrom.Address
-                    )
-                    : null,
-                RoomTo: entity.RoomTo != null
-                    ? new RoomShortDTO(
-                        Id: entity.RoomTo.Id,
-                        Name: entity.RoomTo.Name,
-                        Address: entity.RoomTo.Address
-                    )
-                    : null,
-                User: entity.User != null
-                    ? new UserShortDTO(
-                        Id: entity.User.Id,
-                        Username: entity.User.Username,
-                        IsAdmin: entity.User.IsAdmin
-                    )
-                    : null
-            )).ToList();
+            var dtos = _mapper.MapMovementDetailedDTORange(logs.ToList());
             return Result<List<MovementDetailedDTO>>.Success(dtos);
         }
         catch (Exception e)
@@ -195,19 +144,7 @@ public class LogService : ILogService
         try
         {
             var logs = await _database.StatusLogRepository.GetAll(ct);
-            var dtos = logs.Select(entity => new StatusLogDetailedDTO(
-                Id: entity.Id,
-                StatusFrom: _statusExt.GetStringName(entity.StatusFrom),
-                StatusTo: _statusExt.GetStringName(entity.StatusTo),
-                Timestamp: entity.Timestamp,
-                User: entity.User != null
-                    ? new UserShortDTO(
-                        Id: entity.User.Id,
-                        Username: entity.User.Username,
-                        IsAdmin: entity.User.IsAdmin
-                    )
-                    : null
-            )).ToList();
+            var dtos = _mapper.MapStatusLogDetailedDTORange(logs.ToList());
             return Result<List<StatusLogDetailedDTO>>.Success(dtos);
         }
         catch (Exception e)
@@ -221,13 +158,7 @@ public class LogService : ILogService
         try
         {
             var logs = await _database.CreatingLogRepository.GetAll(ct);
-            var dtos = logs.Select(entity => new CreatingLogShortDTO(
-                Id: entity.Id,
-                ItemId: entity.ItemId,
-                UserId: entity.UserId,
-                ItemNumber: entity.InventoryItem.InventoryNumber ?? "Нет номера",
-                Username: entity.User.Username
-            )).ToList();
+            var dtos = _mapper.MapCreatingLogShortDTORange(logs.ToList());
             return Result<List<CreatingLogShortDTO>>.Success(dtos);
         }
         catch (Exception e)
