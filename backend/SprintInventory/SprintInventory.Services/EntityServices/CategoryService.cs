@@ -1,5 +1,6 @@
 ﻿using SprintInventory.Core.Interfaces;
 using SprintInventory.Core.Interfaces.Services.Entity;
+using SprintInventory.Core.Interfaces.Services.Mapper;
 using SprintInventory.Core.Models.Contracts.Create;
 using SprintInventory.Core.Models.Contracts.Delete;
 using SprintInventory.Core.Models.Contracts.Update;
@@ -13,10 +14,12 @@ namespace SprintInventory.Services.EntityServices;
 public class CategoryService : ICategoryService
 {
     private readonly IUnitOfWork _database;
+    private readonly ICategoryMapper _mapper;
 
-    public CategoryService(IUnitOfWork database)
+    public CategoryService(IUnitOfWork database, ICategoryMapper mapper)
     {
         _database = database;
+        _mapper = mapper;
     }
     
     public async Task<Result<Guid>> Create(CategoryCreateContract request, CancellationToken ct)
@@ -114,18 +117,7 @@ public class CategoryService : ICategoryService
         try
         {
             var categories = await _database.CategoryRepository.GetAll(ct);
-            var dtos = categories.Select(entity => new CategoryDetailedDTO(
-                Id: entity.Id,
-                Name: entity.Name,
-                Description: entity.Description,
-                CreatedAt: entity.CreatedAt,
-                CreatorId: entity.CreatorId,
-                Creator: new UserShortDTO(
-                    Id: entity.CreatorId,
-                    Username: entity.Creator.Username,
-                    IsAdmin: entity.Creator.IsAdmin
-                )
-            )).ToList();
+            var dtos = _mapper.MapToCategoryDetailedDTORange(categories.ToList());
             return Result<List<CategoryDetailedDTO>>.Success(dtos);
         }
         catch (Exception e)
@@ -139,11 +131,7 @@ public class CategoryService : ICategoryService
         try
         {
             var categories = await _database.CategoryRepository.GetAll(ct);
-            var dtos = categories.Select(entity => new CategoryShortDTO(
-                Id: entity.Id,
-                Name: entity.Name,
-                Description: entity.Description
-            )).ToList();
+            var dtos = _mapper.MapToCategoryShortDTORange(categories.ToList());
             return Result<List<CategoryShortDTO>>.Success(dtos);
         }
         catch (Exception e)
@@ -158,19 +146,7 @@ public class CategoryService : ICategoryService
         {
             var category = await _database.CategoryRepository.GetById(id, ct);
             if (category == null) return Result<CategoryDetailedDTO>.Failure("Category not found");
-
-            var dto = new CategoryDetailedDTO(
-                Id: category.Id,
-                Name: category.Name,
-                Description: category.Description,
-                CreatedAt: category.CreatedAt,
-                CreatorId: category.CreatorId,
-                Creator: new UserShortDTO(
-                    Id: category.CreatorId,
-                    Username: category.Creator.Username,
-                    IsAdmin: category.Creator.IsAdmin
-                )
-            );
+            var dto = _mapper.MapToCategoryDetailedDTO(category);
             return Result<CategoryDetailedDTO>.Success(dto);
         }
         catch (Exception e)
