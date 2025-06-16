@@ -88,31 +88,11 @@ public class UserService : IUserService
                 userById.Username = request.Username;
             }
 
-            if (request.PasswordHash != null)
-            {
-                userById.PasswordHash = request.PasswordHash;
-            }
-
-            if (request.Name != null)
-            {
-                userById.Name = request.Name;
-            }
-
-            if (request.Surname != null)
-            {
-                userById.Surname = request.Surname;
-            }
-
-            if (request.Patronymic != null)
-            {
-                userById.Patronymic = request.Patronymic;
-            }
-
-            if (request.Patronymic != null && request.Patronymic == "")
-            {
-                userById.Patronymic = null;
-            }
-            
+            if (request.PasswordHash != null) userById.PasswordHash = request.PasswordHash;
+            if (request.Name != null) userById.Name = request.Name;
+            if (request.Surname != null) userById.Surname = request.Surname;
+            if (request.Patronymic != null) userById.Patronymic = request.Patronymic;
+            if (request.Patronymic != null && request.Patronymic == "") userById.Patronymic = null;
             if (request.Email != null)
             {
                 var usersByEmail = await _database.UserRepository.Search(x => x.Email == request.Email, ct);
@@ -120,13 +100,8 @@ public class UserService : IUserService
                 if (userByEmail != null) return Result<Guid>.Failure("User already exists");
                 userById.Email = request.Email;
             }
-
-            if (request.IsAdmin != null)
-            {
-                userById.IsAdmin = request.IsAdmin.Value;
-            }
+            if (request.IsAdmin != null) userById.IsAdmin = request.IsAdmin.Value;
             
-
             var updatedUser = _database.UserRepository.Update(userById, ct);
             await _database.SaveChangesAsync(ct);
             await _database.CommitTransactionAsync(ct);
