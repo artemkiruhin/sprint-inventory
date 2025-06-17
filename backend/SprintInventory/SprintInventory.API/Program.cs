@@ -16,6 +16,15 @@ using SprintInventory.Services.Security;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy("CorsPolicy", builder =>
+    {
+        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials();
+    });
+});
+
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(configuration.GetConnectionString("PostgresSQL"))
         .UseLazyLoadingProxies()
