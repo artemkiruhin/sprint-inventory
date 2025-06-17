@@ -14,4 +14,10 @@
       <Folder Include="Controllers\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\SprintInventory.Core\SprintInventory.Core.csproj" />
+      <ProjectReference Include="..\SprintInventory.Infrastructure\SprintInventory.Infrastructure.csproj" />
+      <ProjectReference Include="..\SprintInventory.Services\SprintInventory.Services.csproj" />
+    </ItemGroup>
+
 </Project>
