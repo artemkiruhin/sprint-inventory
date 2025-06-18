@@ -1,4 +1,8 @@
+using System.Security.Claims;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using SprintInventory.Core.Interfaces;
 using SprintInventory.Core.Interfaces.Repositories;
 using SprintInventory.Core.Interfaces.Services.Entity;
@@ -24,6 +28,69 @@ builder.Services.AddCors(opt =>
         builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials();
     });
 });
+
+builder.Services.AddAuthentication(opt =>
+    {
+        opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(opt =>
+    {
+        opt.TokenValidationParameters = new()
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = configuration["Jwt:Issuer"],
+            ValidAudience = configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(configuration["Jwt:SecurityKey"]
+                                       ?? throw new ApplicationException("SecurityKey is missing."))
+            )
+        };
+        opt.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var token = context.Request.Cookies["jwt"];
+                if (!string.IsNullOrEmpty(token)) context.Token = token;
+                return Task.CompletedTask;
+            },
+            OnTokenValidated = context =>
+            {
+                try
+                {
+                    var claims = context.Principal?.Claims;
+                    var userIdClaim = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+                    if (Guid.TryParse(userIdClaim?.Value, out var userId))
+                    {
+                        var identity = context.Principal.Identity as ClaimsIdentity;
+                        if (identity != null)
+                        {
+                            if (!identity.HasClaim(c => c.Type == ClaimTypes.NameIdentifier))
+                            {
+                                identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId.ToString()));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Failed to parse UserId from token");
+                        context.Fail("Invalid UserId in token");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Token validation error: {ex.Message}");
+                    context.Fail("Invalid token");
+                }
+
+                return Task.CompletedTask;
+            }
+        };
+    });
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(configuration.GetConnectionString("PostgresSQL"))
@@ -77,6 +144,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
