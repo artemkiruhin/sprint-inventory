@@ -132,7 +132,8 @@ builder.Services.AddScoped<IJwtService>(opt =>
     return new JwtService(settings);
 });
 
-
+builder.Services.AddCors();
+builder.Services.AddRouting();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
