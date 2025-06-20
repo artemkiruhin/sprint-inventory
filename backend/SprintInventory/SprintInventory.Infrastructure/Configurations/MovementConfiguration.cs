@@ -23,9 +23,9 @@ public class MovementConfiguration : IEntityTypeConfiguration<InventoryItemMovem
             .HasForeignKey(x => x.UserId);
         opt.HasOne(x => x.RoomFrom)
             .WithMany(x => x.MovementsFrom)
-            .HasForeignKey(x => x.UserId);
+            .HasForeignKey(x => x.RoomFromId);
         opt.HasOne(x => x.RoomTo)
-            .WithMany(x => x.MovementsFrom)
-            .HasForeignKey(x => x.UserId);
+            .WithMany(x => x.MovementsIn)
+            .HasForeignKey(x => x.RoomToId);
     }
 }
